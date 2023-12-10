@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PixelMagic:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PixelMagic_jar</output-path>
+    <root id="archive" name="PixelMagic.jar">
+      <element id="module-output" name="PixelMagic" />
+    </root>
+  </artifact>
+</component>
