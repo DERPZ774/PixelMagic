@@ -1,8 +1,9 @@
 package com.derpz.pixelmagic;
 
 import com.derpz.pixelmagic.UI.UI;
+import com.derpz.pixelmagic.entity.Entity;
 import com.derpz.pixelmagic.entity.Player;
-import com.derpz.pixelmagic.object.SuperObject;
+import com.derpz.pixelmagic.event.EventHandler;
 import com.derpz.pixelmagic.tile.TileManager;
 import com.derpz.pixelmagic.util.AssetSetter;
 import com.derpz.pixelmagic.util.CollisionChecker;
@@ -11,14 +12,17 @@ import com.derpz.pixelmagic.util.Sound;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class GamePanel extends JPanel implements Runnable {
     //SCREEN SETTINGS
     public final int originalTileSize = 16; //16x16 tile
     final int scale = 3;
     public final int tileSize = originalTileSize * scale; //48x48 tile
-    public final int maxScreenCol = 18;
-   public final int maxScreenRow = 14;
+    public final int maxScreenCol = 16;
+   public final int maxScreenRow = 12;
    public final int screenWidth = tileSize * maxScreenCol;
    public final int screenHeight = tileSize * maxScreenRow;
 
@@ -31,17 +35,28 @@ public class GamePanel extends JPanel implements Runnable {
     //FPS
     int FPS = 60;
     public TileManager tileManager = new TileManager(this);
-    KeyHandler keyHandler = new KeyHandler();
+    public KeyHandler keyHandler = new KeyHandler(this);
     Sound music = new Sound();
     Sound soundEvent = new Sound();
 
     public CollisionChecker collisionChecker = new CollisionChecker(this);
     public AssetSetter assetSetter = new AssetSetter(this);
     public UI ui = new UI(this);
+    public EventHandler eventHandler = new EventHandler(this);
     public Thread gameThread;
     //Entity and Obj
     public Player player = new Player(this, keyHandler);
-    public SuperObject[] obj = new SuperObject[10];
+    public Entity[] obj = new Entity[10];
+    public Entity[] npc = new Entity[10];
+    ArrayList<Entity> entityList = new ArrayList<>();
+    //Game state
+    public int gameState;
+    public final int titleState = 0;
+    public final int playState = 1;
+    public final int pauseState = 2;
+    public final int dialogueState = 3;
+
+
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -53,7 +68,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setupGame() {
         assetSetter.setObject();
-        playMusic(0);
+        assetSetter.setNPC();
+        //playMusic(0);
+        gameState = titleState;
     }
 
     public void startGameThread() {
@@ -94,28 +111,65 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-        player.update();
+        if(gameState == playState) {
+            player.update();
+            for (Entity entity : npc) {
+                if (entity != null) {
+                    entity.update();
+                }
+            }
+        }
+        if(gameState == pauseState) {
+
+        }
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D)g;
-        //tile
-        tileManager.draw(g2);
 
-        //object
-        for (SuperObject superObject : obj) {
-            if (superObject != null) {
-                superObject.draw(g2, this);
+        //title screen
+        if(gameState == titleState) {
+            ui.draw(g2);
+        }
+        //others
+        else {
+            //tile
+            tileManager.draw(g2);
+
+            entityList.add(player);
+
+            // add entities to list
+            for (Entity entity : npc) {
+                if (entity != null) {
+                    entityList.add(entity);
+                }
             }
+
+            for (Entity entity : obj) {
+                if (entity != null) {
+                    entityList.add(entity);
+                }
+            }
+
+            // Sort
+            entityList.sort(Comparator.nullsLast(Comparator.comparingInt(e -> e.worldY)));
+
+            // Draw entities
+            for (Entity entity : entityList) {
+                if (entity != null) {
+                    entity.draw(g2);
+                }
+            }
+            // Empty list
+            entityList.clear();
+
+            //UI
+            ui.draw(g2);
         }
 
-        //player
-        player.draw(g2);
 
-        //UI
-        ui.draw(g2);
         g2.dispose();
     }
 

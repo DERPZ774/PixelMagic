@@ -1,21 +1,17 @@
 package com.derpz.pixelmagic.object;
 
 import com.derpz.pixelmagic.GamePanel;
+import com.derpz.pixelmagic.entity.Entity;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Chest extends SuperObject {
-    GamePanel gamePanel;
+public class Chest extends Entity {
+
     public Chest(GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
+        super(gamePanel);
         name = "Chest";
-        try {
-            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/chest.png")));
-            imageScale.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+        down1 = setup("/objects/chest");
     }
 }

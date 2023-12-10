@@ -1,22 +1,26 @@
 package com.derpz.pixelmagic.object;
 
 import com.derpz.pixelmagic.GamePanel;
+import com.derpz.pixelmagic.entity.Entity;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Door extends SuperObject {
-    GamePanel gamePanel;
+public class Door extends Entity {
+
     public Door(GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
+        super(gamePanel);
+
         name = "Door";
-        try {
-            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/door.png")));
-            imageScale.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+        down1 = setup("/objects/door");
         collision = true;
+
+        solidArea.x = 0;
+        solidArea.y = 16;
+        solidArea.width = 48;
+        solidArea.height = 32;
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
     }
 }
