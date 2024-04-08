@@ -48,6 +48,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player = new Player(this, keyHandler);
     public Entity[] obj = new Entity[10];
     public Entity[] npc = new Entity[10];
+    public Entity[] monster = new Entity[20];
     ArrayList<Entity> entityList = new ArrayList<>();
     //Game state
     public int gameState;
@@ -69,6 +70,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void setupGame() {
         assetSetter.setObject();
         assetSetter.setNPC();
+        assetSetter.setMonster();
         //playMusic(0);
         gameState = titleState;
     }
@@ -86,7 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
         long lastTime = System.nanoTime();
         long currentTime;
         long timer = 0;
-        int drawCount = 0;
+        int drawCount = 0; 
 
         while (gameThread != null) {
             currentTime = System.nanoTime();
@@ -112,11 +114,18 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         if(gameState == playState) {
+            //Player
             player.update();
+            //Npc
             for (Entity entity : npc) {
                 if (entity != null) {
                     entity.update();
                 }
+            }
+        }
+        for (Entity entity : monster) {
+            if (entity != null) {
+                entity.update();
             }
         }
         if(gameState == pauseState) {
@@ -138,9 +147,9 @@ public class GamePanel extends JPanel implements Runnable {
             //tile
             tileManager.draw(g2);
 
+            // add entities to list
             entityList.add(player);
 
-            // add entities to list
             for (Entity entity : npc) {
                 if (entity != null) {
                     entityList.add(entity);
@@ -148,6 +157,12 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             for (Entity entity : obj) {
+                if (entity != null) {
+                    entityList.add(entity);
+                }
+            }
+
+            for (Entity entity : monster) {
                 if (entity != null) {
                     entityList.add(entity);
                 }

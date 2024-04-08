@@ -1,16 +1,10 @@
 package com.derpz.pixelmagic.entity;
 
 import com.derpz.pixelmagic.GamePanel;
-import com.derpz.pixelmagic.object.Key;
-import com.derpz.pixelmagic.util.ImageScale;
 import com.derpz.pixelmagic.util.KeyHandler;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Objects;
 
 public class Player extends Entity {
 
@@ -86,6 +80,10 @@ public class Player extends Entity {
             int npcIndex = gamePanel.collisionChecker.checkEntity(this, gamePanel.npc);
             interactNpc(npcIndex);
 
+            //monster collision
+            int monsterIndex = gamePanel.collisionChecker.checkEntity(this, gamePanel.monster);
+            contactMonster(monsterIndex);
+
             //event check
             gamePanel.eventHandler.checkEvent();
             gamePanel.keyHandler.enterPressed = false;
@@ -112,6 +110,13 @@ public class Player extends Entity {
             if (spriteCounter > 16) {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
+            }
+        }
+        if(invincible) {
+            invincibleCounter ++;
+            if (invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
             }
         }
     }
@@ -166,6 +171,15 @@ public class Player extends Entity {
         }
     }
 
+    public void contactMonster(int i) {
+        if(i != 999) {
+            if(!invincible) {
+                life -= 1;
+                invincible = true;
+            }
+        }
+    }
+
     public void draw(Graphics2D g2) {
 
         BufferedImage image = null;
@@ -207,6 +221,18 @@ public class Player extends Entity {
                 break;
         }
 
+        if (invincible) {
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+        }
+        ///ToDo add blinking affect
+
         g2.drawImage(image, screenX, screenY,null);
+        //Reset alpha
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+        //Debug
+//        g2.setFont(new Font("Arial", Font.PLAIN, 26));
+//        g2.setColor(Color.white);
+//        g2.drawString("Invincible:"+invincibleCounter, 10, 400);
     }
 }

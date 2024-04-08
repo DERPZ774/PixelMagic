@@ -40,7 +40,8 @@ public class KeyHandler implements KeyListener {
                             switch (gamePanel.ui.commandNum) {
                                 case 0 -> {
                                     gamePanel.gameState = gamePanel.playState;
-                                    gamePanel.playMusic(0);
+                                    //gamePanel.playMusic(0);
+                                    ///ToDo add music here
                                 }
                                 case 1 -> {
                                     //add later

@@ -20,5 +20,4 @@ public class Main {
         gamePanel.setupGame();
         gamePanel.startGameThread();
     }
-    //3rd vid 8:22 mins in
 }

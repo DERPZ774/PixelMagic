@@ -2,6 +2,7 @@ package com.derpz.pixelmagic.util;
 
 import com.derpz.pixelmagic.GamePanel;
 import com.derpz.pixelmagic.entity.NPCWizard;
+import com.derpz.pixelmagic.monster.GreenSlime;
 import com.derpz.pixelmagic.object.Boots;
 import com.derpz.pixelmagic.object.Chest;
 import com.derpz.pixelmagic.object.Door;
@@ -52,6 +53,16 @@ public class AssetSetter {
         gamePanel.npc[0] = new NPCWizard(gamePanel);
         gamePanel.npc[0].worldX = gamePanel.tileSize * 21;
         gamePanel.npc[0].worldY = gamePanel.tileSize * 21;
+    }
+
+    public void setMonster() {
+        gamePanel.monster[0] = new GreenSlime(gamePanel);
+        gamePanel.monster[0].worldX = gamePanel.tileSize * 23;
+        gamePanel.monster[0].worldY = gamePanel.tileSize * 36;
+
+        gamePanel.monster[1] = new GreenSlime(gamePanel);
+        gamePanel.monster[1].worldX = gamePanel.tileSize * 23;
+        gamePanel.monster[1].worldY = gamePanel.tileSize * 37;
     }
 
 }
