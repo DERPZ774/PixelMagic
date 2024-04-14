@@ -1,6 +1,8 @@
 package com.derpz.pixelmagic.entity;
 
 import com.derpz.pixelmagic.GamePanel;
+import com.derpz.pixelmagic.object.ShieldWood;
+import com.derpz.pixelmagic.object.SwordNormal;
 import com.derpz.pixelmagic.util.KeyHandler;
 
 import java.awt.*;
@@ -12,6 +14,7 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
     public int hasKey = 0;
+    public boolean attackCancel = false;
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler) {
         super(gamePanel);
@@ -44,9 +47,28 @@ public class Player extends Entity {
         direction = "idle";
 
         //player stats
+        level = 1;
         maxLife = 6;
         life = maxLife;
+        strength = 1;
+        dexterity = 1;
+        exp = 0;
+        nextLevelExp = 5;
+        coin = 0;
+        currentWeapon = new SwordNormal(gamePanel);
+        currentShield = new ShieldWood(gamePanel);
+        attack = getAttack(); //Total attack value is decided by strength and weapon
+        defense = getDefense(); //Total attack value is decided by dex and shield
     }
+
+    public int getAttack() {
+        return attack = strength * currentWeapon.attackValue;
+    }
+
+    public int getDefense() {
+        return defense = dexterity * currentShield.defenseValue;
+    }
+
     public void getPlayerImage() {
         up1 = setup("/player/wizard_up_1" , gamePanel.tileSize, gamePanel.tileSize);
         up2 = setup("/player/wizard_up_2", gamePanel.tileSize, gamePanel.tileSize);
@@ -105,7 +127,7 @@ public class Player extends Entity {
             //event check
             gamePanel.eventHandler.checkEvent();
 
-            //if collision is not on player can move
+            //if collision is not on, player can move
             if(!collisionOn && !keyHandler.enterPressed) {
                 switch (direction) {
                     case "up":
@@ -122,6 +144,12 @@ public class Player extends Entity {
                         break;
                 }
             }
+            if (keyHandler.enterPressed && !attackCancel) {
+                //gamePanel.playSoundEvent(7);
+                attacking = true;
+                spriteCounter = 0;
+            }
+            attackCancel = false;
             gamePanel.keyHandler.enterPressed = false;
 
             spriteCounter ++;
@@ -226,18 +254,22 @@ public class Player extends Entity {
 
         if (gamePanel.keyHandler.enterPressed) {
             if (i != 999) {
+                attackCancel = true;
                 gamePanel.gameState = gamePanel.dialogueState;
                 gamePanel.npc[i].speak();
             }
             else {
+                gamePanel.playSoundEvent(7);
                 attacking = true;
             }
+
         }
     }
 
     public void contactMonster(int i) {
         if(i != 999) {
             if(!invincible) {
+                gamePanel.playSoundEvent(6);
                 life -= 1;
                 invincible = true;
             }
@@ -247,11 +279,13 @@ public class Player extends Entity {
     public void damageMonster(int i) {
         if (i != 999) {
             if (!gamePanel.monster[i].invincible) {
+                gamePanel.playSoundEvent(5);
                 gamePanel.monster[i].life -= 1;
                 gamePanel.monster[i].invincible = true;
+                gamePanel.monster[i].damageReaction();
 
                 if (gamePanel.monster[i].life <= 0) {
-                    gamePanel.monster[i] = null;
+                    gamePanel.monster[i].dying = true;
                 }
             }
         }

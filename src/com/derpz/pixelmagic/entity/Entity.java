@@ -28,24 +28,45 @@ public class Entity {
     public boolean collisionOn = false;
     public boolean invincible = false;
     boolean attacking = false;
+    public boolean alive = true;
+    public boolean dying = false;
+    boolean hpBarOn = false;
 
     //counter
     public int spriteCounter = 0;
     public int actionCounter = 0;
     public int invincibleCounter = 0;
+    int dyingCounter = 0;
+    int hpBarCounter = 0;
 
     //character stats
     public int type; //0 = player, 1 = npc, 2 = monster
+    public String name;
     public int speed;
     public int maxLife;
     public int life;
-    public String name;
+    public int level;
+    public int strength;
+    public int dexterity;
+    public int attack;
+    public int defense;
+    public int exp;
+    public int nextLevelExp;
+    public int coin;
+    public Entity currentWeapon;
+    public Entity currentShield;
+
+    //Item attributes
+    public int attackValue;
+    public int defenseValue;
+
 
     public Entity(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     public void setAction() {}
+    public void damageReaction() {}
     public void speak() {
         if (dialogues[dialogueIndex] == null) {
             dialogueIndex = 0;
@@ -81,6 +102,7 @@ public class Entity {
         if(this.type == 2 && contactPlayer) {
             if(!gamePanel.player.invincible) {
                 //dmg player
+                gamePanel.playSoundEvent(7);
                 gamePanel.player.life -= 1;
                 gamePanel.player.invincible = true;
             }
@@ -165,12 +187,54 @@ public class Entity {
                     image = idle;
                     break;
             }
+
+            //monster health
+            if (type == 2 && hpBarOn && alive) {
+                double oneScale = (double) gamePanel.tileSize / maxLife;
+                double hpBarValue = oneScale * life;
+
+                g2.setColor(new Color(35, 35, 35));
+                g2.fillRect(screenX - 1, screenY - 16, gamePanel.tileSize + 2, 12);
+                g2.setColor(new Color(255, 0, 30));
+                g2.fillRect(screenX, screenY - 15, (int) hpBarValue, 10);
+
+                hpBarCounter ++;
+
+                if (hpBarCounter > 600) {
+                    hpBarCounter = 0;
+                    hpBarOn = false;
+                }
+            }
+
             if (invincible) {
+                hpBarOn = true;
+                hpBarCounter = 0;
                 float opacity = (float) Math.abs(Math.sin(invincibleCounter * 0.1)); // Adjust the multiplier for speed
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
             }
+            if (dying) {
+                dyingAnimation(g2);
+            }
             g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }
+    }
+
+    public void dyingAnimation(Graphics2D g2) {
+        dyingCounter++;
+
+        // Calculate opacity based on whether the counter is even or odd
+        float opacity = (dyingCounter % 20 < 10) ? 0.0f : 1.0f;
+
+
+        // Apply the calculated opacity
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+
+        // Stop the animation when dyingCounter reaches 40
+        if (dyingCounter >= 40) {
+            dyingCounter = 0; // Reset the counter for future use or stop it altogether
+            dying = false;
+            alive = false;
         }
     }
 

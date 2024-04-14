@@ -59,4 +59,9 @@ public class GreenSlime extends Entity {
         }
     }
 
+    public void damageReaction() {
+        actionCounter = 0;
+        direction = gamePanel.player.direction;
+    }
+
 }

@@ -21,88 +21,114 @@ public class KeyHandler implements KeyListener {
         int code = e.getKeyCode();
         //title state
         if(gamePanel.gameState == gamePanel.titleState) {
-            switch (gamePanel.ui.titleScreenState) {
-                case 0 -> {
-                    switch (code) {
-                        case KeyEvent.VK_W -> {
-                            gamePanel.ui.commandNum --;
-                            if(gamePanel.ui.commandNum < 0) {
-                                gamePanel.ui.commandNum = 3;
-                            }
-                        }
-                        case KeyEvent.VK_S -> {
-                            gamePanel.ui.commandNum ++;
-                            if(gamePanel.ui.commandNum > 3) {
-                                gamePanel.ui.commandNum = 0;
-                            }
-                        }
-                        case KeyEvent.VK_ENTER -> {
-                            switch (gamePanel.ui.commandNum) {
-                                case 0 -> {
-                                    gamePanel.gameState = gamePanel.playState;
-                                    //gamePanel.playMusic(0);
-                                    ///ToDo add music here
-                                }
-                                case 1 -> {
-                                    //add later
-                                }
-                                case 2 -> {
-                                    gamePanel.ui.titleScreenState = 1;
-                                    gamePanel.ui.commandNum = 0;
-                                }
-                                case 3 -> {
-                                    System.exit(0);
-                                }
-                            }
-                        }
-                    }
-                }
-                case 1 -> {
-                    if (code == KeyEvent.VK_ENTER) {
-                        gamePanel.ui.titleScreenState = 0;
-                    }
-                }
-            }
-
+            titleState(code);
         }
 
         //play state
        else if(gamePanel.gameState == gamePanel.playState) {
-            switch (code) {
-                case KeyEvent.VK_W -> {
-                    upPressed = true;
-                }
-                case KeyEvent.VK_S -> {
-                    downPressed = true;
-                }
-                case KeyEvent.VK_A -> {
-                    leftPressed = true;
-                }
-                case KeyEvent.VK_D -> {
-                    rightPressed = true;
-                }
-                case KeyEvent.VK_ESCAPE -> {
-                    gamePanel.gameState = gamePanel.pauseState;
-                }
-                case KeyEvent.VK_ENTER -> {
-                    enterPressed = true;
-                }
-            }
+            playState(code);
         }
 
         //pause state
         else if(gamePanel.gameState == gamePanel.pauseState) {
-            if(code == KeyEvent.VK_ESCAPE) {
-                gamePanel.gameState = gamePanel.playState;
-            }
+            pauseState(code);
         }
 
         //dialogue state
         else if (gamePanel.gameState == gamePanel.dialogueState) {
-            if(code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
-                gamePanel.gameState = gamePanel.playState;
+            dialogueState(code);
+        }
+        //character state
+        else if (gamePanel.gameState == gamePanel.characterState) {
+            characterState(code);
+        }
+    }
+    public void titleState(int code) {
+        switch (gamePanel.ui.titleScreenState) {
+            case 0 -> {
+                switch (code) {
+                    case KeyEvent.VK_W -> {
+                        gamePanel.ui.commandNum --;
+                        if(gamePanel.ui.commandNum < 0) {
+                            gamePanel.ui.commandNum = 3;
+                        }
+                    }
+                    case KeyEvent.VK_S -> {
+                        gamePanel.ui.commandNum ++;
+                        if(gamePanel.ui.commandNum > 3) {
+                            gamePanel.ui.commandNum = 0;
+                        }
+                    }
+                    case KeyEvent.VK_ENTER -> {
+                        switch (gamePanel.ui.commandNum) {
+                            case 0 -> {
+                                gamePanel.gameState = gamePanel.playState;
+                                //gamePanel.playMusic(0);
+                                ///ToDo add music here
+                            }
+                            case 1 -> {
+                                //add later
+                            }
+                            case 2 -> {
+                                gamePanel.ui.titleScreenState = 1;
+                                gamePanel.ui.commandNum = 0;
+                            }
+                            case 3 -> {
+                                System.exit(0);
+                            }
+                        }
+                    }
+                }
             }
+            case 1 -> {
+                if (code == KeyEvent.VK_ENTER) {
+                    gamePanel.ui.titleScreenState = 0;
+                }
+            }
+        }
+    }
 
+    public void playState(int code) {
+        switch (code) {
+            case KeyEvent.VK_W -> {
+                upPressed = true;
+            }
+            case KeyEvent.VK_S -> {
+                downPressed = true;
+            }
+            case KeyEvent.VK_A -> {
+                leftPressed = true;
+            }
+            case KeyEvent.VK_D -> {
+                rightPressed = true;
+            }
+            case KeyEvent.VK_ESCAPE -> {
+                gamePanel.gameState = gamePanel.pauseState;
+            }
+            case KeyEvent.VK_C -> {
+                gamePanel.gameState = gamePanel.characterState;
+            }
+            case KeyEvent.VK_ENTER -> {
+                enterPressed = true;
+            }
+        }
+    }
+
+    public void pauseState(int code) {
+        if(code == KeyEvent.VK_ESCAPE) {
+            gamePanel.gameState = gamePanel.playState;
+        }
+    }
+
+    public void dialogueState(int code) {
+        if(code == KeyEvent.VK_ENTER || code == KeyEvent.VK_SPACE) {
+            gamePanel.gameState = gamePanel.playState;
+        }
+    }
+
+    public void characterState(int code) {
+        if (code == KeyEvent.VK_C) {
+            gamePanel.gameState = gamePanel.playState;
         }
     }
 

@@ -24,7 +24,7 @@ public class EventHandler {
         if(hit(27, 16, "right")) {
             damagePit(gamePanel.dialogueState);
         }
-        if(hit(23, 13, "up")) {
+        if(hit(23, 12, "up")) {
             healingPool(gamePanel.dialogueState);
         }
     }
@@ -59,6 +59,7 @@ public class EventHandler {
     public void healingPool(int gameState) {
         if(gamePanel.keyHandler.enterPressed) {
             gamePanel.gameState = gameState;
+            gamePanel.player.attackCancel = true;
             gamePanel.ui.currentDialogue = "You drank the mystical water! \n Life points recovered!";
             gamePanel.player.life = gamePanel.player.maxLife;
         }

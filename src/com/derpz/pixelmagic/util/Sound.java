@@ -3,8 +3,6 @@ package com.derpz.pixelmagic.util;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
 import java.net.URL;
 
 public class Sound {
@@ -17,6 +15,9 @@ public class Sound {
         soundURL[2] = getClass().getResource("/sound/powerup.wav");
         soundURL[3] = getClass().getResource("/sound/unlock.wav");
         soundURL[4] = getClass().getResource("/sound/fanfare.wav");
+        soundURL[5] = getClass().getResource("/sound/hitmonster.wav");
+        soundURL[6] = getClass().getResource("/sound/receivedamage.wav");
+        soundURL[7] = getClass().getResource("/sound/swingweapon.wav");
     }
 
     public void setFile(int i) {
