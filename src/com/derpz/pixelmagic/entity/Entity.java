@@ -11,27 +11,35 @@ import java.util.Objects;
 
 public class Entity {
     GamePanel gamePanel;
-    public int worldX, worldY;
-    public int speed;
     public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, idle;
-    public String direction = "down";
-    public int spriteCounter = 0;
-    public int spriteNum = 1;
+    public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2;
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
+    public Rectangle attackArea = new Rectangle(0, 0, 0, 0);
     public int solidAreaDefaultX, solidAreaDefaultY;
-    public boolean collisionOn = false;
-    public int actionCounter;
-    public boolean invincible = false;
-    public int invincibleCounter = 0;
     String[] dialogues = new String[20];
+    public boolean collision = false;
+    public BufferedImage image, image2, image3;
+
+    //state
+    public int worldX, worldY;
+    public String direction = "down";
+    public int spriteNum = 1;
+    int dialogueIndex = 0;
+    public boolean collisionOn = false;
+    public boolean invincible = false;
+    boolean attacking = false;
+
+    //counter
+    public int spriteCounter = 0;
+    public int actionCounter = 0;
+    public int invincibleCounter = 0;
+
     //character stats
+    public int type; //0 = player, 1 = npc, 2 = monster
+    public int speed;
     public int maxLife;
     public int life;
-    int dialogueIndex = 0;
-    public BufferedImage image, image2, image3;
     public String name;
-    public boolean collision = false;
-    public int type; //0 = player, 1 = npc, 2 = monster
 
     public Entity(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -100,6 +108,13 @@ public class Entity {
             spriteNum = (spriteNum == 1) ? 2 : 1;
             spriteCounter = 0;
         }
+        if(invincible) {
+            invincibleCounter ++;
+            if (invincibleCounter > 40) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
 
     }
 
@@ -150,17 +165,22 @@ public class Entity {
                     image = idle;
                     break;
             }
+            if (invincible) {
+                float opacity = (float) Math.abs(Math.sin(invincibleCounter * 0.1)); // Adjust the multiplier for speed
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            }
             g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         }
     }
 
-    public BufferedImage setup(String imagePath) {
+    public BufferedImage setup(String imagePath, int width, int height) {
         ImageScale imageScale = new ImageScale();
         BufferedImage image = null;
 
         try {
             image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(  imagePath + ".png")));
-            image = imageScale.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
+            image = imageScale.scaleImage(image, width, height);
         }catch (IOException e) {
             e.printStackTrace();
         }

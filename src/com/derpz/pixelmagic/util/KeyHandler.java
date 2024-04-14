@@ -67,7 +67,7 @@ public class KeyHandler implements KeyListener {
         }
 
         //play state
-        if(gamePanel.gameState == gamePanel.playState) {
+       else if(gamePanel.gameState == gamePanel.playState) {
             switch (code) {
                 case KeyEvent.VK_W -> {
                     upPressed = true;
