@@ -1,12 +1,14 @@
 package com.derpz.pixelmagic.entity;
 
 import com.derpz.pixelmagic.GamePanel;
+import com.derpz.pixelmagic.object.Key;
 import com.derpz.pixelmagic.object.ShieldWood;
 import com.derpz.pixelmagic.object.SwordNormal;
 import com.derpz.pixelmagic.util.KeyHandler;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Player extends Entity {
 
@@ -15,6 +17,8 @@ public class Player extends Entity {
     public final int screenY;
     public int hasKey = 0;
     public boolean attackCancel = false;
+    public ArrayList<Entity> inventory = new ArrayList<>();
+    public final int maxInventorySize = 20;
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler) {
         super(gamePanel);
@@ -28,8 +32,8 @@ public class Player extends Entity {
         solidArea.y = 16;
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
-        solidArea.width = 20;
-        solidArea.height = 20;
+        solidArea.width = 33;
+        solidArea.height = 33;
 
         //attack range
         attackArea.width = 36;
@@ -38,6 +42,7 @@ public class Player extends Entity {
         setDefaultValues();
         getPlayerImage();
         getPlayerAttackImage();
+        setItems();
     }
 
     public void setDefaultValues() {
@@ -59,6 +64,13 @@ public class Player extends Entity {
         currentShield = new ShieldWood(gamePanel);
         attack = getAttack(); //Total attack value is decided by strength and weapon
         defense = getDefense(); //Total attack value is decided by dex and shield
+    }
+
+    public void setItems() {
+        inventory.add(currentWeapon);
+        inventory.add(currentShield);
+        inventory.add(new Key(gamePanel));
+        inventory.add(new Key(gamePanel));
     }
 
     public int getAttack() {
@@ -184,8 +196,8 @@ public class Player extends Entity {
 
             //Adjust players worldX/Y for attackArea
             switch (direction) {
-                case "up": worldY -= attackArea.height; break;
-                case "down": worldY += attackArea.height; break;
+                case "up": worldY -= gamePanel.tileSize; break;
+                case "down": worldY +=  gamePanel.tileSize; break;
                 case "left": worldX -= attackArea.width; break;
                 case "right": worldX += attackArea.width; break;
             }
@@ -239,13 +251,6 @@ public class Player extends Entity {
                     gamePanel.ui.currentDialogue = "You have obtained a speed upgrade!";
                     gamePanel.obj[i] = null;
                     break;
-                case "Chest":
-                    gamePanel.ui.gameFinished = true;
-                    //gamePanel.stopMusic();
-                    gamePanel.playSoundEvent(4);
-                    gamePanel.gameState = gamePanel.dialogueState;
-                    gamePanel.ui.currentDialogue = "You have obtained new magical knowledge!\n To be continued...";
-                    break;
             }
         }
     }
@@ -268,9 +273,15 @@ public class Player extends Entity {
 
     public void contactMonster(int i) {
         if(i != 999) {
-            if(!invincible) {
+            if(!invincible && gamePanel.monster[i].alive && !gamePanel.monster[i].dying) {
                 gamePanel.playSoundEvent(6);
-                life -= 1;
+
+                int damage = gamePanel.monster[i].attack - defense;
+                if (damage < 0) {
+                    damage = 0;
+                }
+
+                life -= damage;
                 invincible = true;
             }
         }
@@ -280,16 +291,44 @@ public class Player extends Entity {
         if (i != 999) {
             if (!gamePanel.monster[i].invincible) {
                 gamePanel.playSoundEvent(5);
-                gamePanel.monster[i].life -= 1;
+
+                int damage = attack - gamePanel.monster[i].defense;
+                if (damage < 0) {
+                    damage = 0;
+                }
+
+                gamePanel.monster[i].life -= damage;
+                gamePanel.ui.addMessage(damage + " damage!");
                 gamePanel.monster[i].invincible = true;
                 gamePanel.monster[i].damageReaction();
 
                 if (gamePanel.monster[i].life <= 0) {
                     gamePanel.monster[i].dying = true;
+                    gamePanel.ui.addMessage("Killed the " + gamePanel.monster[i].name + "!");
+                    gamePanel.ui.addMessage("Exp +" + gamePanel.monster[i].exp + "!");
+                    exp += gamePanel.monster[i].exp;
+                    checkLevelUp();
                 }
             }
         }
 
+    }
+
+    public void checkLevelUp() {
+        if (exp >= nextLevelExp) {
+            level++;
+            nextLevelExp = nextLevelExp * 2;
+            maxLife += 2;
+            strength++;
+            dexterity++;
+            attack = getAttack();
+            defense = getDefense();
+
+            gamePanel.playSoundEvent(8);
+            gamePanel.gameState = gamePanel.dialogueState;
+            gamePanel.ui.currentDialogue = "You are level " + level + " now!\n"
+                    + "You feel stronger!";
+        }
     }
 
     public void draw(Graphics2D g2) {
@@ -380,7 +419,6 @@ public class Player extends Entity {
             float opacity = (float) Math.abs(Math.sin(invincibleCounter * 0.1)); // Adjust the multiplier for speed
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
         }
-        ///ToDo add blinking affect
 
         g2.drawImage(image, tempScreenX, tempScreenY,null);
         //Reset alpha
@@ -390,5 +428,18 @@ public class Player extends Entity {
 //        g2.setFont(new Font("Arial", Font.PLAIN, 26));
 //        g2.setColor(Color.white);
 //        g2.drawString("Invincible:"+invincibleCounter, 10, 400);
+        // DEBUG
+//        // AttackArea
+//        tempScreenX = screenX + solidArea.x;
+//        tempScreenY = screenY + solidArea.y;
+//        switch(direction) {
+//            case "up": tempScreenY = screenY - attackArea.height; break;
+//            case "down": tempScreenY = screenY + gamePanel.tileSize; break;
+//            case "left": tempScreenX = screenX - attackArea.width; break;
+//            case "right": tempScreenX = screenX + gamePanel.tileSize; break;
+//        }
+//        g2.setColor(Color.red);
+//        g2.setStroke(new BasicStroke(1));
+//        g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
     }
 }

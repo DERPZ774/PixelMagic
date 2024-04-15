@@ -10,5 +10,6 @@ public class ShieldWood extends Entity {
         name = "Wood Shield";
         down1 = setup("/objects/shield_wood", gamePanel.tileSize, gamePanel.tileSize);
         defenseValue = 1;
+        description = "[" + name + "]\nMade of wood.";
     }
 }

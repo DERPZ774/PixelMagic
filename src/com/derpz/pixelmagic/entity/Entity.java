@@ -59,6 +59,7 @@ public class Entity {
     //Item attributes
     public int attackValue;
     public int defenseValue;
+    public String description = "";
 
 
     public Entity(GamePanel gamePanel) {
@@ -97,13 +98,19 @@ public class Entity {
         gamePanel.collisionChecker.checkObject(this, false);
         gamePanel.collisionChecker.checkEntity(this, gamePanel.npc);
         gamePanel.collisionChecker.checkEntity(this, gamePanel.monster);
+
         boolean contactPlayer = gamePanel.collisionChecker.checkPlayer(this);
 
         if(this.type == 2 && contactPlayer) {
             if(!gamePanel.player.invincible) {
                 //dmg player
-                gamePanel.playSoundEvent(7);
-                gamePanel.player.life -= 1;
+                gamePanel.playSoundEvent(6);
+
+                int damage = attack - gamePanel.player.defense;
+                if (damage < 0) {
+                    damage = 0;
+                }
+                gamePanel.player.life -= damage;
                 gamePanel.player.invincible = true;
             }
         }

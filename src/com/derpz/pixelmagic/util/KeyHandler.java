@@ -8,6 +8,9 @@ import java.awt.event.KeyListener;
 public class KeyHandler implements KeyListener {
     GamePanel gamePanel;
     public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
+    //Debug
+    public boolean showDebugText = false;
+
     public KeyHandler(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
     }
@@ -111,6 +114,18 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_ENTER -> {
                 enterPressed = true;
             }
+            //Debug
+            case KeyEvent.VK_T -> {
+                if (!showDebugText) {
+                    showDebugText = true;
+                }
+                else if (showDebugText) {
+                    showDebugText = false;
+                }
+            }
+            case KeyEvent.VK_R -> {
+                gamePanel.tileManager.loadMap("/maps/worldV2.txt");
+            }
         }
     }
 
@@ -127,8 +142,35 @@ public class KeyHandler implements KeyListener {
     }
 
     public void characterState(int code) {
-        if (code == KeyEvent.VK_C) {
-            gamePanel.gameState = gamePanel.playState;
+
+        switch (code) {
+            case KeyEvent.VK_C -> {
+                gamePanel.gameState = gamePanel.playState;
+            }
+            case KeyEvent.VK_W -> {
+                if (gamePanel.ui.slotRow != 0) {
+               gamePanel.ui.slotRow--;
+               gamePanel.playSoundEvent(9);
+                }
+            }
+            case KeyEvent.VK_A -> {
+                if (gamePanel.ui.slotCol != 0) {
+                    gamePanel.ui.slotCol--;
+                    gamePanel.playSoundEvent(9);
+                }
+            }
+            case KeyEvent.VK_S -> {
+                if (gamePanel.ui.slotRow != 3) {
+                    gamePanel.ui.slotRow++;
+                    gamePanel.playSoundEvent(9);
+                }
+            }
+            case KeyEvent.VK_D -> {
+                if (gamePanel.ui.slotCol != 4) {
+                    gamePanel.ui.slotCol++;
+                    gamePanel.playSoundEvent(9);
+                }
+            }
         }
     }
 

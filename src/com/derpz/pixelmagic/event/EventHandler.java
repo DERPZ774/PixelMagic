@@ -62,6 +62,7 @@ public class EventHandler {
             gamePanel.player.attackCancel = true;
             gamePanel.ui.currentDialogue = "You drank the mystical water! \n Life points recovered!";
             gamePanel.player.life = gamePanel.player.maxLife;
+            gamePanel.assetSetter.setMonster();
         }
     }
 
